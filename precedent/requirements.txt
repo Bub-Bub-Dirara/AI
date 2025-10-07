@@ -1,0 +1,13 @@
+pandas
+openpyxl
+beautifulsoup4
+html5lib
+regex
+python-dateutil
+sentence-transformers
+faiss-cpu
+numpy
+scikit-learn
+tqdm
+joblib
+pyarrow
