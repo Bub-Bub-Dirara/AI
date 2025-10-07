@@ -1,12 +1,41 @@
-.venv/
 __pycache__/
 *.py[cod]
-*.log
+*.pyd
+*.so
+*.dylib
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.cache/
+.ipynb_checkpoints/
+
+.venv/
+.env
+.env.*
+.vscode/
 .DS_Store
 Thumbs.db
+desktop.ini
 
-data/**    
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+*.bak
+~$*   # MS Office temp files
+
 index/
-models/ 
+models/
+outputs/
+runs/
+checkpoints/
+*.index   # FAISS index anywhere
+
+data/**
+!data/.gitkeep
+!data/README.md
+
+
 
 data/**/*.csv
