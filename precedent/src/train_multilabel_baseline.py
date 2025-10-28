@@ -28,8 +28,6 @@ def main():
 
     kw = json.load(open(args.keywords, "r", encoding="utf-8"))
     df["labels"] = df["본문"].map(lambda x: weak_labels(x, kw))
-
-    # 멀티라벨에서는 stratify가 리스트를 못 받으므로 대표 라벨(첫 라벨)로 대체
     strat = df["labels"].map(lambda labs: labs[0] if len(labs) > 0 else "기타")
 
     X_train, X_test, y_train, y_test = train_test_split(

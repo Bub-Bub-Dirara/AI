@@ -21,12 +21,10 @@ def main():
 
     index, meta, model = load_index(args.index_dir)
 
-    # 날짜 문자열 정렬용 보정(간단)
     df = meta.copy()
     if args.court and "법원명" in df.columns:
         df = df[df["법원명"].isin(args.court)]
     if "선고일자" in df.columns:
-        # 선고일자가 YYYY.MM.DD 형태면 -로 통일
         df["선고일자"] = df["선고일자"].astype(str).str.replace(".", "-", regex=False)
         if args.from_date:
             df = df[df["선고일자"] >= args.from_date.replace(".","-")]

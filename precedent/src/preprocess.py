@@ -18,33 +18,27 @@ def main():
     ap.add_argument("--out", dest="out", default="../data/cases_clean.parquet")
     args = ap.parse_args()
 
-    # CSV만 쓴다고 했지만 xlsx도 대응
     if args.inp.lower().endswith((".xls",".xlsx")):
         df = pd.read_excel(args.inp)
     else:
         df = pd.read_csv(args.inp)
 
-    # 1) 열 제거
     cols = [c for c in df.columns if c not in DROP_COLS]
     df = df[cols]
 
-    # 2) 열 정렬(있는 것만)
     cols2 = [c for c in KEEP_COLS if c in df.columns]
     df = df[cols2]
 
-    # 3) 텍스트 정리
     for c in ["사건명","판시사항","판결요지","이유"]:
         if c in df.columns:
             df[c] = df[c].map(clean_html_text)
 
-    # 4) 본문 생성
     def get(col): return df[col] if col in df.columns else ""
     df["본문"] = (get("사건명") + "\n" + get("판시사항") + "\n" +
                   get("판결요지") + "\n" + get("이유")).str.replace(r"\n{2,}", "\n", regex=True).str.strip()
 
     df = df[df["본문"].str.len() > 0].copy()
 
-    # 5) 저장
     out = args.out
     os.makedirs(os.path.dirname(out), exist_ok=True)
     if out.lower().endswith(".parquet"):
