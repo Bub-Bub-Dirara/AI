@@ -3,7 +3,7 @@ import joblib, argparse, numpy as np
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--text", required=True)
-    ap.add_argument("--model", default="../models/multilabel_tfidf_lr.joblib")
+    ap.add_argument("--model", default="../precedent/models/multilabel_tfidf_lr.joblib")
     args = ap.parse_args()
 
     obj = joblib.load(args.model)
