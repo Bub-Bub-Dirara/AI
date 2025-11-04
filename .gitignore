@@ -1,48 +1,28 @@
+# Python bytecode files
 __pycache__/
 *.py[cod]
+*.pyo
 *.pyd
-*.so
-*.dylib
-*.egg-info/
-.pytest_cache/
-.mypy_cache/
-.cache/
+
+# Virtual environment
+.venv/
+
+# Jupyter Notebook checkpoints
 .ipynb_checkpoints/
 
-precedent/data/**
-!precedent/data/.gitkeep
-!precedent/data/README.md
-precedent/index/**
-precedent/models/**
-
-
-.venv/
-.env
-.env.*
+# IDE specific files (VS Code)
 .vscode/
-.DS_Store
-Thumbs.db
-desktop.ini
 
+# Model files (if you don't want to include them in version control)
+models/*.joblib
+
+# Data files (to avoid large datasets being uploaded to GitHub)
+data/cases_clean.parquet
+data/prec_full.csv
+
+# Log files
 *.log
-logs/
-tmp/
-temp/
+
+# Temporary files
 *.tmp
-*.bak
-~$*   # MS Office temp files
-
-index/
-models/
-outputs/
-runs/
-checkpoints/
-*.index   # FAISS index anywhere
-
-data/**
-!data/.gitkeep
-!data/README.md
-
-
-
-data/**/*.csv
+*.swp

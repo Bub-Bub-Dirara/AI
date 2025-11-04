@@ -24,11 +24,11 @@ cd precedent
 # 가상환경
 python -m venv .venv
 # Windows
-.venv\Scripts\activate
+.venv\Scrirts\activate
 '''
 
 '''
-pip install -r requirements.txt
+pip install -
 '''
 
 '''
@@ -66,5 +66,10 @@ python src/search.py --q "배당이의 전원합의체 시효이익 포기" --k 
 
 python src/train_multilabel_baseline.py --data data/cases_clean.parquet --keywords src/labels_keywords.json
 python src/predict_labels.py --text "시효완성 후 일부 변제의 시효이익 포기 여부"
-python src/extract_entities.py --text "2016. 2. 6. 150만 원 변제, 연 20%, 채권최고액 2억 원 근저당"
+python src/extract_entities.py --text "150만 원 변제, 연 20%, 채권최고액 2억 원 근저당"
+'''
+
+
+'''
+pip install openai pdfplumber fastapi uvicorn python-multipart
 '''

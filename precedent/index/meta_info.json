@@ -1,0 +1,13 @@
+{
+  "model": "jhgan/ko-sroberta-multitask",
+  "dim": 768,
+  "size": 73727,
+  "text_col": "본문",
+  "id_col": "판례일련번호",
+  "excluded_fields": [
+    "상세_JSON",
+    "상세_XML",
+    "상세_HTML",
+    "판례상세링크_절대URL"
+  ]
+}
