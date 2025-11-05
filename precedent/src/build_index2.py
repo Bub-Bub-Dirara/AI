@@ -1,5 +1,5 @@
 # src/build_index.py
-
+# 법 모델 디자인
 import os
 import json
 import numpy as np

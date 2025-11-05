@@ -1,28 +1,42 @@
-# Python bytecode files
+# === Python ===
 __pycache__/
-*.py[cod]
+*.pyc
 *.pyo
 *.pyd
-
-# Virtual environment
-.venv/
-
-# Jupyter Notebook checkpoints
-.ipynb_checkpoints/
-
-# IDE specific files (VS Code)
-.vscode/
-
-# Model files (if you don't want to include them in version control)
-models/*.joblib
-
-# Data files (to avoid large datasets being uploaded to GitHub)
-data/cases_clean.parquet
-data/prec_full.csv
-
-# Log files
 *.log
 
-# Temporary files
-*.tmp
-*.swp
+# === Virtual Environment ===
+venv/
+.venv/
+
+# === Data Files ===
+precedent/data/
+!precedent/data/README.md  # (필요하면 예외로 폴더 설명 파일만 남김)
+
+# === Index Files ===
+precedent/index/faiss.index
+precedent/index/ids.npy
+precedent/index/*.json
+precedent/index/*.jsonl
+!precedent/index/README.md
+
+# === Model Files ===
+precedent/models/
+!precedent/models/README.md
+
+# === System / IDE ===
+.DS_Store
+.vscode/
+.idea/
+
+# === Jupyter ===
+*.ipynb_checkpoints/
+
+# === Build & Temp ===
+dist/
+build/
+*.egg-info/
+
+# === OS ===
+Thumbs.db
+desktop.ini
