@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.schemas.contracts import ContractRequest, RiskReport
+from ..schemas.contracts import ContractRequest, RiskReport
 
 router = APIRouter(prefix="/precheck", tags=["Precheck"])
 

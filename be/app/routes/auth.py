@@ -3,11 +3,11 @@ from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from app.db import get_db
-from app.models.user import User
-from app.schemas.user import UserCreate, UserLogin, UserOut, Token
-from app.core.security import get_password_hash, verify_password, create_access_token
-from app.core.config import ACCESS_TOKEN_EXPIRE_DELTA, SECRET_KEY, ALGORITHM
+from ..db import get_db
+from ..models.user import User
+from ..schemas.user import UserCreate, UserLogin, UserOut, Token
+from ..core.security import get_password_hash, verify_password, create_access_token
+from ..core.config import ACCESS_TOKEN_EXPIRE_DELTA, SECRET_KEY, ALGORITHM
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 bearer_scheme = HTTPBearer()

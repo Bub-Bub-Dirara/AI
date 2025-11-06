@@ -1,0 +1,2 @@
+-r precedent/requirements.txt
+-r be/requirements.txt
