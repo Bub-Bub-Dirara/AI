@@ -7,7 +7,7 @@ from fastapi import FastAPI, APIRouter, Query
 from .laws_search_topk import LawRetriever
 from .gpt import gpt_router
 from .case_search_topk import cases_router
-
+from .gpt_risk import router as gpt_risk_router
 # ===== 기본 앱 세팅 =====
 APP_ROOT = Path(__file__).resolve().parents[1]
 app = FastAPI(title="precedent API")
@@ -40,3 +40,4 @@ def laws_search(
 app.include_router(laws_router) 
 app.include_router(gpt_router)  
 app.include_router(cases_router)
+app.include_router(gpt_risk_router)
