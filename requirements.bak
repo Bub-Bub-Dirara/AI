@@ -1,0 +1,21 @@
+# --- unified core pins (set only here) ---
+fastapi==0.115.6
+starlette==0.41.2        # fastapi 0.115.x 호환 범위(>=0.40,<0.42)
+uvicorn==0.30.6
+
+pydantic==2.12.4
+pydantic_core==2.41.5
+
+SQLAlchemy==2.0.36
+python-dotenv==1.0.1     # BE의 <2.0 범위와 일치. precedent의 1.2.1도 OK지만 1.0.1로 통일
+python-multipart==0.0.9  # BE 요구와 일치
+email-validator==2.3.0   # BE의 <3.0 범위와 일치
+
+boto3==1.34.131
+botocore==1.34.131
+
+anyio==4.11.0            # starlette/fastapi 0.115.x와 호환
+# -----------------------------------------
+
+-r be/requirements.txt
+-r precedent/requirements.txt
