@@ -9,17 +9,17 @@ from fastapi import APIRouter, UploadFile, File
 from openai import OpenAI
 
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "sk-s내 API KEYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA!!!!!!!!!!!!!!!!!")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "내 API키ㅃ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1")
 if not OPENAI_API_KEY.startswith("sk-"):
     raise RuntimeError("OPENAI_API_KEY 환경변수(또는 파일 내 상수)를 설정하세요.")
 _oai = OpenAI(api_key=OPENAI_API_KEY)
 
-ANALYZE_MODEL = os.getenv("GPT_ANALYZE_MODEL", "gpt-4o")   # 필요시 gpt-4o-mini
-RISK_MODEL    = os.getenv("GPT_RISK_MODEL",    "gpt-4o")
+ANALYZE_MODEL = os.getenv("GPT_ANALYZE_MODEL", "gpt-4o-mini")   # 필요시 gpt-4o-mini
+RISK_MODEL    = os.getenv("GPT_RISK_MODEL",    "gpt-4o-mini")
 
 IMG_MIME = {"image/png", "image/jpeg", "image/webp", "image/heic", "image/heif"}
 
-router = APIRouter(prefix="/gpt", tags=["gpt"])
+router = APIRouter(prefix="/gpt")
 
 def _guess_mime(fn: str) -> str:
     mt, _ = guess_type(fn)
