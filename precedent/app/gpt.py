@@ -138,7 +138,3 @@ async def analyze_with_gpt(files: list[UploadFile] = File(...)):
             })
 
     return {"items": results}
-
-@gpt_router.get("/health")
-def gpt_health():
-    return {"gpt_model": GPT_MODEL, "ok": True}
