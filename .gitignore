@@ -41,4 +41,6 @@ build/
 Thumbs.db
 desktop.ini
 
+# Env files
 .env
+.env.*
