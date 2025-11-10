@@ -19,9 +19,9 @@ class ChatMessage(Base):
     thread = relationship("ChatThread", back_populates="messages")
 
     # 첨부파일 역참조가 이미 있다면 유지
-    # attachments = relationship(
-    #     "ChatAttachment",
-    #     back_populates="message",
-    #     cascade="all, delete-orphan",
-    #     lazy="selectin",
-    # )
+    attachments = relationship(
+        "ChatAttachment",
+        back_populates="message",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
