@@ -9,7 +9,7 @@ from fastapi import APIRouter, UploadFile, File
 from openai import OpenAI
 
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "내 API키ㅃ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "내 OPEN API 키!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 if not OPENAI_API_KEY.startswith("sk-"):
     raise RuntimeError("OPENAI_API_KEY 환경변수(또는 파일 내 상수)를 설정하세요.")
 _oai = OpenAI(api_key=OPENAI_API_KEY)

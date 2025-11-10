@@ -76,3 +76,8 @@ python src/extract_entities.py --text "150만 원 변제, 연 20%, 채권최고�
 '''
 pip install openai pdfplumber fastapi uvicorn python-multipart
 '''
+
+
+'''
+python -m uvicorn server:app --reload --reload-dir be --reload-dir precedent --port 8000
+'''

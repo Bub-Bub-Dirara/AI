@@ -13,7 +13,7 @@ from mimetypes import guess_type
 from openai import OpenAI
 
 GPT_MODEL = "gpt-4o-mini"
-GPT_API_KEY = "sk-p내키A"
+GPT_API_KEY = "내 OPEN API 키!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 client = OpenAI(api_key=GPT_API_KEY)
 
 IMG_MIME = {"image/png", "image/jpeg", "image/webp", "image/heic", "image/heif"}
