@@ -1,5 +1,5 @@
-from dotenv import load_dotenv, find_dotenv
-load_dotenv(find_dotenv(), override=True)  # .env 로드
+from dotenv import load_dotenv
+load_dotenv(dotenv_path="D:/AI/.env", override=True)
 
 import os
 import secrets
