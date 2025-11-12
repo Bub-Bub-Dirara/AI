@@ -10,6 +10,9 @@ from fastapi import APIRouter, HTTPException, Body
 from pydantic import BaseModel, AnyHttpUrl, Field
 from openai import OpenAI
 
+from dotenv import load_dotenv
+import os
+load_dotenv(override=True)
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 if not OPENAI_API_KEY.startswith("sk-"):
     raise RuntimeError("OPENAI_API_KEY 환경변수가 설정되지 않았습니다.")
@@ -78,7 +81,10 @@ def _json_only(s: str) -> Dict[str, Any]:
 RISK_SYSTEM = (
     "당신은 한국 임대차(전세) 문서 위험 분석가입니다. "
     "입력 문서에서 전세사기 관점의 위험 문장을 찾아 설명하세요. "
-    "반드시 JSON만 출력합니다:\n"
+    "항상 최소 3개의 위험 문장을 포함해야 합니다. "
+    "꼼꼼하게 확인하고 최대한 위험 문장을 많이 찾으세요. "
+    "문서가 짧거나 명확하지 않아도 추정해서 작성하세요. "
+    "반드시 아래 JSON 형식만 출력합니다:\n"
     "{\n"
     '  "summary_score": number,\n'
     '  "recommendations": [string, ...],\n'
@@ -86,8 +92,10 @@ RISK_SYSTEM = (
     '     {"sentence": string, "reason": string, "risk_label": "높음"|"중간"|"낮음", "tags": [string,...]}\n'
     "  ]\n"
     "}\n"
-    "null/빈값 금지, 문맥상 최대한 채워 넣으세요."
+    "null, 빈배열, 빈문자열 금지. "
+    "모든 필드는 반드시 채워야 하며, risky_sentences는 1개 이상 포함해야 합니다."
 )
+
 RISK_USER_TEXT  = "다음 텍스트에서 위험 문장을 추출하세요.\n텍스트---\n{TEXT}\n---끝"
 RISK_USER_IMAGE = "다음 이미지를 읽고 동일 기준으로 위험 문장을 추출하세요."
 

@@ -16,11 +16,15 @@ from mimetypes import guess_type
 from openai import OpenAI
 
 from dotenv import load_dotenv
-load_dotenv()
+import os
+load_dotenv(override=True)
 
 # --------- 설정 ----------
 GPT_MODEL = "gpt-4o-mini"
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+
 if not OPENAI_API_KEY:
     raise RuntimeError("OPENAI_API_KEY 환경변수가 설정되지 않았습니다.")
 client = OpenAI(api_key=OPENAI_API_KEY)
