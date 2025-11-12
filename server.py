@@ -4,6 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from precedent.app.api import ai_router as _ai_router
 from be.app.routes import router as be_router
 
+from dotenv import load_dotenv
+load_dotenv()
+
 app = FastAPI(title="Project Server")
 
 origins = [

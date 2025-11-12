@@ -14,6 +14,9 @@ from pydantic import BaseModel, Field, AnyHttpUrl
 from mimetypes import guess_type
 from openai import OpenAI
 
+from dotenv import load_dotenv
+load_dotenv()
+
 # --------- 설정 ----------
 GPT_MODEL = "gpt-4o-mini"
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
