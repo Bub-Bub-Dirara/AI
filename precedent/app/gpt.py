@@ -1,4 +1,5 @@
-# precedent/app/gpt_risk.py
+# precedent
+# precedent/app/gpt.py
 from __future__ import annotations
 import os
 import re
@@ -41,7 +42,6 @@ def _encode_image_to_data_url_bytes(content: bytes, mime: str) -> str:
     return f"data:{mime};base64,{b64}"
 
 def _read_pdf_text_bytes(content: bytes, limit_chars: int = 15000) -> str:
-    """바이트 기반 PDF 텍스트 추출 (pdfplumber)."""
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
         tmp.write(content)
         tmp_path = tmp.name
@@ -80,7 +80,6 @@ def _normalize_rating_and_kind(parsed: Dict[str, Any]) -> Dict[str, Any]:
 
     rating = parsed.get("rating") or {}
     label_text = _nz(rating.get("label"), "괜찮아요")
-    # 이미 B/M/G 코드면 유지, 아니면 변환
     code = label_text if label_text in {"B", "M", "G"} else LABEL_TO_CODE.get(label_text, "M")
 
     reasons = rating.get("reasons", [])
@@ -168,7 +167,7 @@ async def _analyze_bytes(content: bytes, mime: str) -> Dict[str, Any]:
         model=GPT_MODEL,
         messages=messages,
         max_tokens=900,
-        response_format={"type": "json_object"},  # JSON 강제
+        response_format={"type": "json_object"}, 
     )
     content_text = resp.choices[0].message.content
     try:
@@ -176,14 +175,7 @@ async def _analyze_bytes(content: bytes, mime: str) -> Dict[str, Any]:
     except Exception:
         parsed = {"parse_error": True, "raw": content_text}
 
-    norm = _normalize_rating_and_kind(parsed)
-    # 분석에 사용된 프롬프트 메타(디버깅/투명성용)
-    norm["prompt"] = {
-        "model": GPT_MODEL,
-        "system": SYSTEM_PROMPT,
-        "user_preview": user_msg[:500],
-    }
-    return norm
+    return _normalize_rating_and_kind(parsed)
 
 SYSTEM_PROMPT = (
     "당신은 한국 전세사기 문서 분석 전문가입니다. "
@@ -202,11 +194,9 @@ SYSTEM_PROMPT = (
     "주의: null, 빈 문자열, 불명확 등의 값 없이 반드시 문장으로 출력할 것.\n"
 )
 
-# --------- 입력 스키마 ----------
 class AnalyzeUrlsIn(BaseModel):
     urls: List[AnyHttpUrl] = Field(..., description="분석할 파일 URL 배열")
 
-# --------- 라우터 ----------
 gpt_router = APIRouter(prefix="/gpt", tags=["gpt"])
 
 @gpt_router.post("/analyze", summary="전세사기 문서 분석 (URL 여러 개 전용)")
@@ -224,14 +214,13 @@ async def analyze_with_gpt_urls(payload: AnalyzeUrlsIn = Body(...)):
                 "fileurl": u,  # ✅ URL 그대로 반환
                 "mime": mime,
                 "modality": ("image" if mime in IMG_MIME else ("pdf" if "pdf" in mime else "other")),
-                "kind": normalized["kind"],  # ✅ GPT 분류
+                "kind": normalized["kind"], 
                 "law_input":  normalized["law_input"],
                 "case_input": normalized["case_input"],
                 "rating": {
                     "label":   normalized["rating"]["label"],   # G/M/B
                     "reasons": normalized["rating"]["reasons"],
-                },
-                "prompt": normalized.get("prompt"),
+                }
             })
         except HTTPException as he:
             results.append({"fileurl": u, "kind": "other", "error": he.detail})
