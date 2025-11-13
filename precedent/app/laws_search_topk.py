@@ -253,7 +253,7 @@ class LawRetriever:
         for rank, (i, f, c, b, k, p, t, s, d) in enumerate(hits, start=1):
             r = self.corpus_rows[i]
             law, art, raw = r["law_name"], str(r["article_no"]), r["text"]
-            snippet = textwrap.shorten(raw, width=180, placeholder=" …")
+            snippet = raw
             pretty_art = art if art.startswith("제") else (f"제{art}조" if art else "")
             out.append({
                 "rank": rank,
