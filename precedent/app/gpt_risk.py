@@ -14,6 +14,8 @@ from pydantic import BaseModel, AnyHttpUrl, Field
 from openai import OpenAI
 from dotenv import load_dotenv
 
+import fitz  # PyMuPDF 
+
 load_dotenv(override=True)
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
@@ -105,6 +107,52 @@ def _json_only(s: str) -> Dict[str, Any]:
         return {"parse_error": True, "raw": s}
 
 
+def _attach_pdf_positions(content: bytes, risks: List[Dict[str, Any]]) -> None:
+    """
+    각 risk에 대해 anchor(없으면 sentence)를 기준으로 PDF 내 위치(page, x, y, w, h) 목록을 붙인다.
+    positions: [{page, x, y, w, h}] (PDF 원본 좌표 기준)
+    """
+    if not risks:
+        return
+
+    # anchor / sentence 가 하나도 없으면 그냥 리턴
+    any_anchor = any((r.get("anchor") or r.get("sentence")) for r in risks)
+    if not any_anchor:
+        return
+
+    doc = fitz.open(stream=content, filetype="pdf")
+    try:
+        for r in risks:
+            anchor = (r.get("anchor") or r.get("sentence") or "").strip()
+            if not anchor:
+                continue
+
+            positions: List[Dict[str, float]] = []
+
+            for page_index, page in enumerate(doc):
+                rects = page.search_for(anchor)
+                if not rects:
+                    continue
+
+                for rect in rects:
+                    positions.append(
+                        {
+                            "page": page_index + 1,
+                            "x": float(rect.x0),
+                            "y": float(rect.y0),
+                            "w": float(rect.x1 - rect.x0),
+                            "h": float(rect.y1 - rect.y0),
+                            "page_width": float(page.rect.width),
+                            "page_height": float(page.rect.height),
+                        }
+                    )
+
+            if positions:
+                r["positions"] = positions
+            else:
+                r["positions"] = []
+    finally:
+        doc.close()
 
 RISK_SYSTEM = (
     "당신은 한국 임대차(전세/월세) 계약서 전문 위험 분석가입니다. "
@@ -115,6 +163,7 @@ RISK_SYSTEM = (
     '  "risky_sentences": [\n'
     "    {\n"
     '      "sentence": string,\n'
+    '      "anchor": string,\n'
     '      "reason": string,\n'
     '      "risk_label": "B" | "M" | "G",\n'
     '      "law_input": string,\n'
@@ -134,6 +183,8 @@ RISK_SYSTEM = (
     "5) 문서가 불완전하더라도 위험 문장은 최소 1개 이상 반드시 생성하세요.\n"
     "6) 의미가 다른 위험 포인트는 가능한 한 많이 추출하되, 동일/유사 의미는 하나로 합치세요. "
     "   (위험 문장은 최대 30개 정도까지 추출해도 괜찮습니다.)\n"
+    "7) \"anchor\" 필드는 반드시 계약서 원문에 그대로 등장하는 짧은 구절(약 5~30자)을 그대로 복사하여 넣으세요. "
+    "   anchor는 PDF에서 해당 위험 문장을 찾는 기준이 되므로, 핵심이 잘 드러나는 부분을 선택하세요.\n"
 )
 
 RISK_USER_TEXT = (
@@ -221,6 +272,7 @@ async def extract_risks_urls(payload: AnalyzeUrlsIn = Body(...)):
                 rs = [
                     {
                         "sentence": "위험 문장 식별 실패",
+                        "anchor": "위험 문장 식별 실패",
                         "reason": "계약서에서 명확한 위험 조항을 인식하지 못했습니다.",
                         "risk_label": "G",
                         "law_input": (
@@ -234,15 +286,15 @@ async def extract_risks_urls(payload: AnalyzeUrlsIn = Body(...)):
                     }
                 ]
 
-            cleaned: List[Dict[str, str]] = []
+            cleaned: List[Dict[str, Any]] = [] 
             seen: set[tuple[str, str]] = set()
-
 
             for r in rs[:50]:
                 if not isinstance(r, dict):
                     continue
 
                 sentence = (r.get("sentence") or "").strip()
+                anchor = (r.get("anchor") or "").strip()
                 reason = (r.get("reason") or "").strip()
                 raw_label = (r.get("risk_label") or "").strip()
 
@@ -250,6 +302,8 @@ async def extract_risks_urls(payload: AnalyzeUrlsIn = Body(...)):
                     sentence = "위험 문장 내용 미상"
                 if not reason:
                     reason = "문맥상 임차인에게 불리하게 작용할 수 있는 조항으로 추정됩니다."
+                if not anchor:
+                    anchor = sentence
 
                 if raw_label in VALID_CODE_LABELS:
                     code_label = raw_label
@@ -285,10 +339,12 @@ async def extract_risks_urls(payload: AnalyzeUrlsIn = Body(...)):
                 cleaned.append(
                     {
                         "sentence": sentence,
+                        "anchor": anchor,
                         "reason": reason,
                         "risk_label": code_label,
                         "law_input": law_input,
                         "case_input": case_input,
+                        # positions는 나중에 _attach_pdf_positions에서 채움
                     }
                 )
 
@@ -296,6 +352,7 @@ async def extract_risks_urls(payload: AnalyzeUrlsIn = Body(...)):
                 cleaned.append(
                     {
                         "sentence": "위험 문장 식별 실패",
+                        "anchor": "위험 문장 식별 실패",
                         "reason": "후처리 과정에서 유효한 위험 문장이 남지 않았습니다.",
                         "risk_label": "G",
                         "law_input": (
@@ -308,6 +365,10 @@ async def extract_risks_urls(payload: AnalyzeUrlsIn = Body(...)):
                         ),
                     }
                 )
+
+            # PDF인 경우 PyMuPDF로 좌표
+            if modality == "pdf":
+                _attach_pdf_positions(content, cleaned)
 
             items_out.append(
                 {
@@ -323,10 +384,12 @@ async def extract_risks_urls(payload: AnalyzeUrlsIn = Body(...)):
                     "risky_sentences": [
                         {
                             "sentence": "처리 중 오류 발생",
+                            "anchor": "처리 중 오류 발생",
                             "reason": str(he.detail),
                             "risk_label": "G",
                             "law_input": "URL 오류로 인해 계약서를 분석할 수 없습니다.",
-                            "case_input": "입력 URL이 유효하지 않을 경우 동일 계약서에 대해 재분석이 가능한지 여부."
+                            "case_input": "입력 URL이 유효하지 않을 경우 동일 계약서에 대해 재분석이 가능한지 여부.",
+                            "positions": [],
                         }
                     ],
                 }
@@ -338,10 +401,12 @@ async def extract_risks_urls(payload: AnalyzeUrlsIn = Body(...)):
                     "risky_sentences": [
                         {
                             "sentence": "처리 중 예외 발생",
+                            "anchor": "처리 중 예외 발생",
                             "reason": str(e),
                             "risk_label": "G",
                             "law_input": "서버 내부 오류로 인해 계약서 내용을 정상적으로 분석하지 못했습니다.",
-                            "case_input": "분석 시스템 오류 발생 시 동일 계약서의 재분석이 안정적으로 가능한지 여부."
+                            "case_input": "분석 시스템 오류 발생 시 동일 계약서의 재분석이 안정적으로 가능한지 여부.",
+                            "positions": [],
                         }
                     ],
                 }
