@@ -38,7 +38,7 @@ def _sentences(text: Optional[str]) -> List[str]:
     parts = SENT_SPLIT.split(t)
     return [p.strip() for p in parts if p.strip()]
 
-def _smart_summary(row: Dict[str, Any], limit_chars: int = 700) -> Optional[str]:
+def _smart_summary(row: Dict[str, Any], limit_chars: int = 50000) -> Optional[str]:
     # 우선순위: 판결요지 → 판시사항 → 본문
     for col, take in (("판결요지", 3), ("판시사항", 3), ("본문", 2)):
         txt = row.get(col)
@@ -171,7 +171,7 @@ def search_topk(
         }
 
         if with_summary:
-            item["본문요약"] = _smart_summary(row, 700) or meta.get("본문요약", "")
+            item["본문요약"] = _smart_summary(row, 50000) or meta.get("본문요약", "")
 
         if with_body:
             body = row.get("본문") or body_map.get(doc_id)
@@ -206,7 +206,7 @@ def get_case(doc_id: int, with_summary: bool = True, with_body: bool = False):
         "사건번호": row.get("사건번호") or meta.get("사건번호"),
     }
     if with_summary:
-        item["본문요약"] = _smart_summary(row, 700) or meta.get("본문요약", "")
+        item["본문요약"] = _smart_summary(row, 50000) or meta.get("본문요약", "")
     if with_body:
         body = row.get("본문") or body_map.get(key)
         if isinstance(body, str) and body.strip():
