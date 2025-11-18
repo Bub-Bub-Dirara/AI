@@ -19,7 +19,7 @@ from dotenv import load_dotenv
 import os
 load_dotenv(override=True)
 
-# --------- 설정 ----------
+# 모델 설정
 GPT_MODEL = "gpt-4o-mini"
 
 
