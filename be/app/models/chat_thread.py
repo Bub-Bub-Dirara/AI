@@ -4,22 +4,23 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from be.app.core.db import Base
 
-
 class ChannelType(str, enum.Enum):
     PREVENTION = "PREVENTION"
     POST_CASE = "POST_CASE"
 
-
 class ChatThread(Base):
-    __tablename__ = "chat_threads"  # ← ForeignKey와 일치하도록 복수형으로 통일
+    __tablename__ = "chat_threads"
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), index=True, nullable=False)
     channel = Column(Enum(ChannelType), nullable=False)
     title = Column(String, nullable=True)
-    status = Column(String, default="OPEN")  # OPEN/CLOSED/ARCHIVED
+    status = Column(String, default="OPEN")
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     closed_at = Column(DateTime(timezone=True))
+
+    # 새로 추가: 이 스레드에 연결된 리포트 파일 (EvidenceFile.id)
+    report_file_id = Column(Integer, ForeignKey("evidence_files.id"), nullable=True)
 
     # 관계
     messages = relationship(
@@ -28,3 +29,5 @@ class ChatThread(Base):
         cascade="all, delete-orphan",
         lazy="selectin",
     )
+
+    report_file = relationship("EvidenceFile", backref="chat_threads", lazy="selectin")

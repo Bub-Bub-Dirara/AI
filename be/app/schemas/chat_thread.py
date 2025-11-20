@@ -6,17 +6,21 @@ from .chat_message import MessageOut
 Channel = Literal["PREVENTION", "POST_CASE"]
 
 class ThreadCreate(BaseModel):
+    # mappingPage에서 쓸 body
     user_id: int
     channel: Channel
     title: Optional[str] = None
+    # 새 필드: 리포트 파일 ID (EvidenceFile.id)
+    report_file_id: Optional[int] = None
 
 
 class ThreadOut(BaseModel):
     id: int
     user_id: int
     channel: Channel
-    title: Optional[str]
+    title: Optional[str] = None
     status: str
+    report_file_id: Optional[int] = None
     created_at: datetime
     closed_at: Optional[datetime] = None
 
@@ -25,7 +29,7 @@ class ThreadOut(BaseModel):
 
 
 class ThreadDetailOut(ThreadOut):
-    # 쓰레드 상세에 최근 메시지 N개를 포함해 내려주고 싶을 때 사용
+    # 스레드 상세에서 메시지 리스트까지 같이 내려줄 때 사용
     recent_messages: Optional[List[MessageOut]] = None
 
 

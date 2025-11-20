@@ -26,6 +26,7 @@ def create_thread(body: ThreadCreate, db: Session = Depends(get_db)):
         user_id=body.user_id,
         channel=ChannelType(body.channel),
         title=body.title,
+        report_file_id=body.report_file_id,  # 리포트 추가
     )
     db.add(thread)
     db.commit()
