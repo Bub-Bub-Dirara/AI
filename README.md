@@ -1,5 +1,5 @@
 # AI
-AI models and pipelines for analyzing precedents and providing fraud-prevention/legal guidance
+AI models and pipelines for analyzing precedents and providing fraud-prevention/legal guidance for JeonSafe
 
 ```
 precedent/
