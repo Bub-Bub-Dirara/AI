@@ -170,7 +170,7 @@ async def _analyze_bytes(content: bytes, mime: str) -> Dict[str, Any]:
     resp = client.chat.completions.create(
         model=GPT_MODEL,
         messages=messages,
-        max_completion_tokens=900,
+        max_completion_tokens=10000,
         response_format={"type": "json_object"}, 
     )
     content_text = resp.choices[0].message.content
@@ -195,8 +195,13 @@ SYSTEM_PROMPT = (
     '     "reasons": [string, string, string]\n'
     "  }\n"
     "}\n"
-    "주의: null, 빈 문자열, 불명확 등의 값 없이 반드시 문장으로 출력할 것.\n"
-    "reasons는 존댓말(〜합니다, 〜됩니다, 〜입니다 등)은 사용\n"
+    "주의: null, 빈 문자열, 불명확 등의 값 없이 반드시 문장으로 출력합니다.\n" \
+    "모든 필드를 반드시 채웁니다."
+    "1) law_input은 한국 임대차 관련 법률 관점에서 2~3문장 정도로 구체적으로 작성합니다.\n"
+    "2) case_input은 반드시 질문형 문장으로, 판례 검색용 쿼리처럼 작성합니다. (예: \"~할 수 있는지 여부.\")\n"
+    "3) null, 빈 문자열, 빈 배열은 절대 사용하지 마세요.\n"
+    "4) 의미가 다른 위험 포인트는 가능한 한 많이 추출하되, 동일/유사 의미는 하나로 합치세요. "
+    "5) reason은 반드시 친절하게 존댓말로 작성하세요.\n"
 )
 
 class AnalyzeUrlsIn(BaseModel):
@@ -216,7 +221,7 @@ async def analyze_with_gpt_urls(payload: AnalyzeUrlsIn = Body(...)):
             content, mime, _detected_name = await _fetch_url(u)
             normalized = await _analyze_bytes(content, mime)
             results.append({
-                "fileurl": u,  # ✅ URL 그대로 반환
+                "fileurl": u,  
                 "mime": mime,
                 "modality": ("image" if mime in IMG_MIME else ("pdf" if "pdf" in mime else "other")),
                 "kind": normalized["kind"], 

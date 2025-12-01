@@ -198,6 +198,7 @@ RISK_SYSTEM = (
     "   (위험 문장은 최대 30개 정도까지 추출해도 괜찮습니다.)\n"
     "7) 'anchor' 필드는 반드시 계약서 원문에 그대로 등장하는 짧은 구절(약 5~30자)을 그대로 복사하여 넣으세요. "
     "   anchor는 PDF에서 해당 위험 문장을 찾는 기준이 되므로, 핵심이 잘 드러나는 부분을 선택하세요.\n"
+     "5) reason은 반드시 친절하게 존댓말로 작성하세요.\n"
 )
 
 RISK_USER_TEXT = (
@@ -219,19 +220,21 @@ RISK_USER_IMAGE = (
 def _risks_from_text(text: str) -> Dict[str, Any]:
     resp = _oai.chat.completions.create(
         model=RISK_MODEL,
-        max_completion_tokens=2000,
+        max_completion_tokens=20000,
         messages=[
             {"role": "system", "content": RISK_SYSTEM},
             {"role": "user", "content": RISK_USER_TEXT.replace("{TEXT}", text)},
         ],
+        response_format={"type": "json_object"},
     )
     return _json_only(resp.choices[0].message.content)
+
 
 
 def _risks_from_image(data_url: str) -> Dict[str, Any]:
     resp = _oai.chat.completions.create(
         model=RISK_MODEL,
-        max_completion_tokens=2000,
+        max_completion_tokens=20000,
         messages=[
             {"role": "system", "content": RISK_SYSTEM},
             {
@@ -242,8 +245,10 @@ def _risks_from_image(data_url: str) -> Dict[str, Any]:
                 ],
             },
         ],
+        response_format={"type": "json_object"},
     )
     return _json_only(resp.choices[0].message.content)
+
 
 
 # ---------------- Models ----------------
