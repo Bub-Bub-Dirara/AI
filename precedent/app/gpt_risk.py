@@ -24,7 +24,7 @@ if not OPENAI_API_KEY.startswith("sk-"):
 
 _oai = OpenAI(api_key=OPENAI_API_KEY)
 
-RISK_MODEL = os.getenv("GPT_RISK_MODEL", "gpt-4o-mini")
+RISK_MODEL = os.getenv("GPT_RISK_MODEL", "gpt-5.1")
 IMG_MIME = {"image/png", "image/jpeg", "image/webp", "image/heic", "image/heif"}
 
 router = APIRouter(prefix="/gpt")
@@ -219,7 +219,7 @@ RISK_USER_IMAGE = (
 def _risks_from_text(text: str) -> Dict[str, Any]:
     resp = _oai.chat.completions.create(
         model=RISK_MODEL,
-        max_tokens=2000,
+        max_completion_tokens=2000,
         messages=[
             {"role": "system", "content": RISK_SYSTEM},
             {"role": "user", "content": RISK_USER_TEXT.replace("{TEXT}", text)},
@@ -231,7 +231,7 @@ def _risks_from_text(text: str) -> Dict[str, Any]:
 def _risks_from_image(data_url: str) -> Dict[str, Any]:
     resp = _oai.chat.completions.create(
         model=RISK_MODEL,
-        max_tokens=2000,
+        max_completion_tokens=2000,
         messages=[
             {"role": "system", "content": RISK_SYSTEM},
             {
@@ -284,7 +284,6 @@ async def extract_risks_urls(payload: AnalyzeUrlsIn = Body(...)):
             if isinstance(rs, dict):
                 rs = [rs]
 
-            # --------------- fallback: 최소 1개 보장 ---------------
             if not rs:
                 rs = [
                     {

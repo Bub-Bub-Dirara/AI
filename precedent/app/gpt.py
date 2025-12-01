@@ -20,7 +20,7 @@ import os
 load_dotenv(override=True)
 
 # 모델 설정
-GPT_MODEL = "gpt-4o-mini"
+GPT_MODEL = "gpt-5.1"
 
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
@@ -170,7 +170,7 @@ async def _analyze_bytes(content: bytes, mime: str) -> Dict[str, Any]:
     resp = client.chat.completions.create(
         model=GPT_MODEL,
         messages=messages,
-        max_tokens=900,
+        max_completion_tokens=900,
         response_format={"type": "json_object"}, 
     )
     content_text = resp.choices[0].message.content
@@ -196,6 +196,7 @@ SYSTEM_PROMPT = (
     "  }\n"
     "}\n"
     "주의: null, 빈 문자열, 불명확 등의 값 없이 반드시 문장으로 출력할 것.\n"
+    "reasons는 존댓말(〜합니다, 〜됩니다, 〜입니다 등)은 사용\n"
 )
 
 class AnalyzeUrlsIn(BaseModel):
